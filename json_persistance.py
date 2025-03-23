@@ -7,7 +7,7 @@ class JsonPersistence(ABCPersistence):
     def __init__(self, file_path: str):
         self.file_path = file_path
 
-    def save(self, data) -> None:
+    def append(self, data) -> None:
         new_data = self.load()
         retval = None
 
@@ -18,6 +18,10 @@ class JsonPersistence(ABCPersistence):
 
         with open(self.file_path, 'w') as file:
             json.dump(retval, file)
+
+    def save(self, data) -> None:
+        with open(self.file_path, 'w') as file:
+            json.dump(data, file)
 
     def load(self):
         try:
