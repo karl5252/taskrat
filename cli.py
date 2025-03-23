@@ -1,5 +1,7 @@
 import typer
 
+from json_persistance import JsonPersistence
+
 app = typer.Typer()
 
 tasks = []
@@ -8,13 +10,18 @@ tasks = []
 @app.command()
 def add_task(task: str):
     tasks.append(task)
+    json_persistence = JsonPersistence('tasks.json')
+    json_persistence.save(tasks)
     typer.echo("Task added.")
 
 
 @app.command()
 def list_tasks():
     print("Tasks:")
-    for task in tasks:
+    json_persistence = JsonPersistence('tasks.json')
+    json = json_persistence.load()
+
+    for task in json:
         typer.echo(f" - {task}")
 
 
