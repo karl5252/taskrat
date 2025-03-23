@@ -1,6 +1,7 @@
 import json
 
 from abc_persistence import ABCPersistence
+from task import Task
 
 
 class JsonPersistence(ABCPersistence):
@@ -8,27 +9,28 @@ class JsonPersistence(ABCPersistence):
         self.file_path = file_path
 
     def append(self, data) -> None:
-        new_data = self.load()
-        retval = None
+        new_data = self.load()  # returns list of tasks or empty list
 
-        if not new_data:
-            retval = [data]
-        else:
-            new_data.append(data)
-            retval = new_data
+        if isinstance(data, str):
+            data = Task(data)
+        if isinstance(data, list):
+            data = [Task(item) for item in data]
+
+        new_data.append(data.to_dict())
 
         with open(self.file_path, 'w') as file:
-            json.dump(retval, file, indent=2)
+            json.dump(new_data, file, indent=2)
 
-    def save(self, data: list) -> None:
-        if not isinstance(data, list):
-            raise ValueError("save() expects a list of tasks, not a single item")
+    def save(self, tasks: list[Task]) -> None:
+        print(f"DEBUG: to save = {[task.to_dict() for task in tasks]}")
         with open(self.file_path, 'w') as file:
-            json.dump(data, file)
+            dicts = [task.to_dict() for task in tasks]
+            json.dump(dicts, file, indent=2)
 
-    def load(self):
+    def load(self) -> list[Task]:
         try:
             with open(self.file_path, 'r') as file:
-                return json.load(file)
+                raw = json.load(file)
+                return [Task.from_dict(obj) for obj in raw]
         except (FileNotFoundError, json.JSONDecodeError):
             return []
