@@ -4,14 +4,12 @@ from json_persistance import JsonPersistence
 
 app = typer.Typer()
 
-tasks = []
 json_persistence = JsonPersistence('tasks.json')
 
 
 @app.command()
 def add_task(task: str):
-    tasks.append(task)
-    json_persistence.append(tasks)
+    json_persistence.append(task)
     typer.echo("Task added.")
 
 
@@ -26,6 +24,7 @@ def list_tasks():
 @app.command()
 def done_task(task: str):
     try:
+        tasks = json_persistence.load()
         tasks.remove(task)
         typer.echo(f"Task {task} done.")
     except ValueError:
@@ -34,9 +33,7 @@ def done_task(task: str):
 
 @app.command()
 def new_tasks(task: str):
-    tasks.clear()
-    tasks.append(task)
-    json_persistence.save(tasks)
+    json_persistence.save(task)
     typer.echo("Tasks cleared.")
 
 

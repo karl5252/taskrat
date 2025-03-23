@@ -12,14 +12,17 @@ class JsonPersistence(ABCPersistence):
         retval = None
 
         if not new_data:
-            retval = data
+            retval = [data]
         else:
-            retval = new_data + data
+            new_data.append(data)
+            retval = new_data
 
         with open(self.file_path, 'w') as file:
-            json.dump(retval, file)
+            json.dump(retval, file, indent=2)
 
-    def save(self, data) -> None:
+    def save(self, data: list) -> None:
+        if not isinstance(data, list):
+            raise ValueError("save() expects a list of tasks, not a single item")
         with open(self.file_path, 'w') as file:
             json.dump(data, file)
 
